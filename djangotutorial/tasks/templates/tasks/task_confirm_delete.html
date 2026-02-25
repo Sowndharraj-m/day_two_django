@@ -1,0 +1,30 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Delete Task — TaskFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Delete Task</h1>
+        <p class="page-subtitle">This action cannot be undone.</p>
+    </div>
+    <a href="{% url 'task_list' %}" class="btn-secondary">← Back</a>
+</div>
+
+<div class="form-container">
+    <div class="delete-card">
+        <div class="delete-icon">🗑️</div>
+        <h2 class="delete-title">Are you sure?</h2>
+        <p class="delete-message">You are about to permanently delete:</p>
+        <div class="delete-task-name">"{{ task.title }}"</div>
+        <p class="delete-warning">This cannot be recovered once deleted.</p>
+        <form method="post" class="delete-form">
+            {% csrf_token %}
+            <div class="form-actions">
+                <a href="{% url 'task_list' %}" class="btn-secondary">Cancel</a>
+                <button type="submit" class="btn-danger">Yes, Delete It</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

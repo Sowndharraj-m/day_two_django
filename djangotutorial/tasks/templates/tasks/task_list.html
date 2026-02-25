@@ -1,0 +1,105 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}TaskFlow — Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">My Tasks</h1>
+        <p class="page-subtitle">Stay organized, get things done.</p>
+    </div>
+    <a href="{% url 'task_create' %}" class="btn-primary">＋ Add Task</a>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-number">{{ counts.total }}</div>
+        <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-card stat-pending">
+        <div class="stat-number">{{ counts.pending }}</div>
+        <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card stat-progress">
+        <div class="stat-number">{{ counts.in_progress }}</div>
+        <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card stat-done">
+        <div class="stat-number">{{ counts.completed }}</div>
+        <div class="stat-label">Completed</div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-bar">
+    <div class="filter-group">
+        <span class="filter-label">Status:</span>
+        <a href="{% url 'task_list' %}" class="filter-pill {% if not status_filter %}active{% endif %}">All</a>
+        <a href="?status=pending{% if priority_filter %}&priority={{ priority_filter }}{% endif %}"
+            class="filter-pill {% if status_filter == 'pending' %}active{% endif %}">Pending</a>
+        <a href="?status=in_progress{% if priority_filter %}&priority={{ priority_filter }}{% endif %}"
+            class="filter-pill {% if status_filter == 'in_progress' %}active{% endif %}">In Progress</a>
+        <a href="?status=completed{% if priority_filter %}&priority={{ priority_filter }}{% endif %}"
+            class="filter-pill {% if status_filter == 'completed' %}active{% endif %}">Completed</a>
+    </div>
+    <div class="filter-group">
+        <span class="filter-label">Priority:</span>
+        <a href="{% url 'task_list' %}{% if status_filter %}?status={{ status_filter }}{% endif %}"
+            class="filter-pill {% if not priority_filter %}active{% endif %}">All</a>
+        <a href="?priority=high{% if status_filter %}&status={{ status_filter }}{% endif %}"
+            class="filter-pill {% if priority_filter == 'high' %}active{% endif %}">🔴 High</a>
+        <a href="?priority=medium{% if status_filter %}&status={{ status_filter }}{% endif %}"
+            class="filter-pill {% if priority_filter == 'medium' %}active{% endif %}">🟡 Medium</a>
+        <a href="?priority=low{% if status_filter %}&status={{ status_filter }}{% endif %}"
+            class="filter-pill {% if priority_filter == 'low' %}active{% endif %}">🟢 Low</a>
+    </div>
+</div>
+
+<!-- Task List -->
+{% if tasks %}
+<div class="tasks-grid">
+    {% for task in tasks %}
+    <div class="task-card priority-{{ task.priority }} {% if task.status == 'completed' %}task-completed{% endif %}">
+        <div class="task-card-top">
+            <div class="task-badges">
+                <span class="badge priority-badge-{{ task.priority }}">
+                    {% if task.priority == 'high' %}🔴{% elif task.priority == 'medium' %}🟡{% else %}🟢{% endif %}
+                    {{ task.get_priority_display }}
+                </span>
+                <span class="badge status-badge-{{ task.status }}">
+                    {% if task.status == 'completed' %}✅{% elif task.status == 'in_progress' %}🔄{% else %}⏳{% endif %}
+                    {{ task.get_status_display }}
+                </span>
+            </div>
+            <div class="task-actions">
+                <a href="{% url 'task_toggle' task.pk %}" class="action-btn toggle-btn" title="Toggle Status">
+                    {% if task.status == 'completed' %}↩{% else %}✓{% endif %}
+                </a>
+                <a href="{% url 'task_update' task.pk %}" class="action-btn edit-btn" title="Edit">✏️</a>
+                <a href="{% url 'task_delete' task.pk %}" class="action-btn delete-btn" title="Delete">🗑️</a>
+            </div>
+        </div>
+        <h3 class="task-title">{{ task.title }}</h3>
+        {% if task.description %}
+        <p class="task-desc">{{ task.description|truncatechars:100 }}</p>
+        {% endif %}
+        <div class="task-meta">
+            {% if task.due_date %}
+            <span class="due-date">📅 Due: {{ task.due_date|date:"M d, Y" }}</span>
+            {% endif %}
+            <span class="created-date">Created {{ task.created_at|date:"M d" }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">🎯</div>
+    <h3>No tasks found</h3>
+    <p>{% if status_filter or priority_filter %}Try clearing the filters, or {% endif %}add your first task to get
+        started!</p>
+    <a href="{% url 'task_create' %}" class="btn-primary">＋ Create Task</a>
+</div>
+{% endif %}
+{% endblock %}

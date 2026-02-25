@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TaskFlow{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">✦</div>
+                    <span class="logo-text">TaskFlow</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{% url 'task_list' %}" class="nav-item {% if request.resolver_match.url_name == 'task_list' %}active{% endif %}">
+                    <span class="nav-icon">📋</span>
+                    <span>All Tasks</span>
+                </a>
+                <a href="{% url 'task_list' %}?status=pending" class="nav-item">
+                    <span class="nav-icon">⏳</span>
+                    <span>Pending</span>
+                </a>
+                <a href="{% url 'task_list' %}?status=in_progress" class="nav-item">
+                    <span class="nav-icon">🔄</span>
+                    <span>In Progress</span>
+                </a>
+                <a href="{% url 'task_list' %}?status=completed" class="nav-item">
+                    <span class="nav-icon">✅</span>
+                    <span>Completed</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{% url 'task_create' %}" class="btn-new-task">
+                    <span>＋</span> New Task
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+        // Animate cards on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.task-card');
+            cards.forEach((card, i) => {
+                card.style.animationDelay = `${i * 0.07}s`;
+                card.classList.add('fade-in');
+            });
+        });
+    </script>
+</body>
+</html>
